@@ -60,14 +60,12 @@ class FunCommands(commands.Cog, name="Fun"):
         await ctx.send(f"owo what's {ctx.author.mention}")
 
     @commands.command(
-        name="up-down-up-down-left-right-left-right-b-a-start",
+        name="up-up-down-down-left-right-left-right-b-a-start",
         hidden=True,
-        aliases=["updownupdownleftrightleftrightbastart"],
+        aliases=["upupdowndownleftrightleftrightbastart"],
     )
     @only_random
-    async def updownupdownleftrightleftrightbastart(
-        self, ctx,
-    ):
+    async def upupdowndownleftrightleftrightbastart(self, ctx,):
         """A lot of typing for nothing."""
         await ctx.send("wow that's a long cheat code. You win 20 CodeCoin!!")
 
