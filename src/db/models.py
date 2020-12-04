@@ -1,3 +1,4 @@
+from datetime import datetime
 from os import getenv
 
 from sqlalchemy import *
@@ -18,6 +19,14 @@ engine = create_engine(postgres_url)
 metadata = MetaData()
 
 Base = declarative_base(bind=engine, metadata=metadata)
+
+
+class Lootbox(Base):
+    __tablename__ = "lootbox"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False, unique=True)
+    lootboxes = Column(Integer, nullable=False)
+    last_earned = Column('timestamp', TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
 
 
 class ReadGuide(Base):
