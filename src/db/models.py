@@ -105,6 +105,18 @@ class Reactions(Base):
         return groupmsgs
 
 
+class Raffles(Base):
+    __tablename__ = "raffles"
+
+    id = Column(Integer, primary_key=True)
+    raffle_id = Column(String, nullable=False)
+    channel_id = Column(String, nullable=False)
+    message_id = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    winners = Column(Integer, nullable=False)
+
+
+
 def session_creator() -> Session:
     session = sessionmaker(bind=engine)
     return session()
