@@ -8,6 +8,7 @@ from glob import glob
 from os import getenv
 from random import choice
 from urllib import parse, request
+import html
 
 import aiohttp
 import discord
@@ -66,7 +67,7 @@ class FunCommands(commands.Cog, name="Fun"):
     )
     @only_random
     async def updownupdownleftrightleftrightbastart(
-        self, ctx,
+            self, ctx,
     ):
         """A lot of typing for nothing."""
         await ctx.send("wow that's a long cheat code. You win 20 CodeCoin!!")
@@ -108,6 +109,25 @@ class FunCommands(commands.Cog, name="Fun"):
                 await asyncio.sleep(1)
         finally:
             await vc.disconnect()
+
+    # entire tag (<a [^>]*>.+?<\/a>)
+    # inner text <a [^>]*>(.+?)<\/a>
+    # extract href link <a[^>]+href=\"(.*?)\"[^>]*>
+    # find tag with link (<a[^>]+href=\"{link}\"[^>]*>.+?<\/a>)
+    @commands.command()
+    async def embedtest(self, ctx):
+        stringmsg = 'Learn from Erwin Chan, a former Microsoft &amp; Amazon software engineering recruiter on how to prepare yourself and stand out from the rest of the crowd as high schoolers and new college undergraduates.&nbsp;&nbsp;<br>Join from a PC, Mac, iPad, iPhone or Android device:<br>&nbsp;&nbsp;&nbsp;&nbsp;Please click this URL to join. <a href=\"https://zoom.us/j/96605864894\">https://zoom.us/j/96605864894</a><br><br>Or join by phone:<br>&nbsp;&nbsp;&nbsp;&nbsp;Dial(for higher quality, dial a number based on your current location):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;US: +1 470 381 2552  or +1 646 558 8656  or +1 267 831 0333  or +1 312 626 6799  or +1 669 900 9128  or +1 971 247 1195  or +1 206 337 9723  or +1 213 338 8477  or +1 346 248 7799  or +1 602 753 0140 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Canada: +1 647 558 0588  or +1 778 907 2071  or +1 204 272 7920  or +1 438 809 7799  or +1 587 328 1099  or +1 647 374 4685 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;United Kingdom: +44 203 901 7895  or +44 208 080 6592 <br>&nbsp;&nbsp;&nbsp;&nbsp;Webinar ID: 966 0586 4894<br>&nbsp;&nbsp;&nbsp;&nbsp;International numbers available: <a href=\"https://zoom.us/u/acxKGQRUlj\">https://zoom.us/u/acxKGQRUlj</a>'
+
+        stringmsg1 = "Learn from Erwin Chan, a former Microsoft &amp; Amazon software engineering recruiter on how to prepare yourself and stand out from the rest of the crowd as high schoolers and new college undergraduates.&nbsp;&nbsp;<br>Join from a PC, Mac, iPad, iPhone or Android device:<br>&nbsp;&nbsp;&nbsp;&nbsp;Please click this URL to join. <a href=\"https://zoom.us/j/96605864894\">https://zoom.us/j/96605864894</a><br><br>Or join by phone:<br>&nbsp;&nbsp;&nbsp;&nbsp;Dial(for higher quality, dial a number based on your current location):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;US: +1 470 381 2552  or +1 646 558 8656  or +1 267 831 0333  or +1 312 626 6799  or +1 669 900 9128  or +1 971 247 1195  or +1 206 337 9723  or +1 213 338 8477  or +1 346 248 7799  or +1 602 753 0140 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Canada: +1 647 558 0588  or +1 778 907 2071  or +1 204 272 7920  or +1 438 809 7799  or +1 587 328 1099  or +1 647 374 4685 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;United Kingdom: +44 203 901 7895  or +44 208 080 6592 <br>&nbsp;&nbsp;&nbsp;&nbsp;Webinar ID: 966 0586 4894<br>&nbsp;&nbsp;&nbsp;&nbsp;International numbers available: <a href=\"https://zoom.us/u/acxKGQRUlj\">https://zoom.us/u/acxKGQRUlj</a>"
+        stringmsg1 = stringmsg1.replace("<br />", "\n").replace("<br>", "\n").replace("<p>", "\n").replace("</p>", "\n").replace("<b>", "**").replace("</b>", "**")
+        stringmsg1 = html.unescape(stringmsg1)
+        a_tags = re.findall("(<a [^>]*>.+?</a>)", stringmsg1)
+        for tag in a_tags:
+            text = re.search("<a [^>]*>(.+?)</a>", tag).group(1)
+            link = re.search("<a[^>]+href=\"(.*?)\"[^>]*>", tag).group(1)
+            stringmsg1 = re.sub(f"(<a[^>]+href=\"{link}\"[^>]*>.+?</a>)", f"[{text}]({link})", stringmsg1)
+        embedVar = discord.Embed(title=f"Starting Soon: {'Workshop: High School/Undergrads - Preparing Yourself to Land Your Internship/Job'}", description=f"Location: {'https://zoom.us/j/96605864894'} \n\n{stringmsg1}", color=0x00ff00)
+        await ctx.send(content="<@&796840081080057856>", embed=embedVar)
 
 
 def setup(bot):

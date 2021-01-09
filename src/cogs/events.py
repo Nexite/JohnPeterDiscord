@@ -1,15 +1,19 @@
 # noinspection PyPackageRequirements
 import json
 import os
+import re
+
 import requests
 import datetime
 from dateutil import parser
 from pytz import timezone
 
 import requests
+import html
 
 # noinspection PyPackageRequirements
 from discord.ext import commands, tasks
+import discord
 
 ROLE_NOTIFY_EVENT = os.getenv("ROLE_NOTIFY_EVENT")
 CHANNEL_EVENT_ANNOUNCE = int(os.getenv("CHANNEL_EVENT_ANNOUNCE"))
@@ -94,17 +98,28 @@ class EventsCog(commands.Cog, name="Events"):
                        if event["start"] > now and event["start"] < soon and not(event["id"] in self.already_notified)]
         for event in events_soon:
             self.already_notified.append(event["id"])
-            description = event['description'].replace(
-                "&nbsp;", " ").replace("<br />", "\n").replace("<br>", "\n")
+            description = event['description'].replace("<br />", "\n").replace("<br>", "\n").replace("<p>", "\n").replace("</p>", "\n").replace("<b>", "**").replace("</b>", "**")
+            description = html.unescape(description)
+            a_tags = re.findall("(<a [^>]*>.+?</a>)", description)
+            for tag in a_tags:
+                text = re.search("<a [^>]*>(.+?)</a>", tag).group(1)
+                link = re.search("<a[^>]+href=\"(.*?)\"[^>]*>", tag).group(1)
+                description = re.sub(f"(<a[^>]+href=\"{link}\"[^>]*>.+?</a>)", f"[{text}]({link})", description)
+
+
+            embed = discord.Embed(
+                title=f"Starting Soon: {event['title']}",
+                description=f"Location: {event['location']} \n\n{description}", color=0x00ff00)
+            channel = await self.bot.fetch_channel(CHANNEL_EVENT_ANNOUNCE)
+            await channel.send(content=f"<@&{ROLE_NOTIFY_EVENT}>", embed=embed)
+
             msg = f"**Starting soon: {event['title']}** ({self.format_start(event['start'])})"
             if event['location']:
                 msg += f"\n{event['location']}"
             msg += f"\n<@&{ROLE_NOTIFY_EVENT}>"
             if description and len(description) > 0:
                 msg += f"\n\n{description}"
-            channel = await self.bot.fetch_channel(CHANNEL_EVENT_ANNOUNCE)
             await channel.send(msg)
-
 
 def setup(bot):
     bot.add_cog(EventsCog(bot))

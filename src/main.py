@@ -67,7 +67,7 @@ initial_cogs = [
     "cogs.snippet",
     "cogs.badge",
     "cogs.showcase",
-    "cogs.gold",
+    # "cogs.gold",
 ]
 loaded_cogs = []
 statuses = [
@@ -206,12 +206,12 @@ async def on_command_error(ctx, error: commands.CommandError):
         handle_exception(type(error), error, error.__traceback__)
     raise error
 
-
 @bot.event
 async def on_message(message):
     # This is just here to exist in case I need it later. Should be moved out soon
     # Insures the other commands are still processed
     await bot.process_commands(message)
+
 
 
 bot.run(BOT_TOKEN, bot=True, reconnect=True)
